@@ -21,7 +21,8 @@ public class Emprestimo implements Persistivel {
     private LocalDateTime dataDevolucaoPrevista;
     private LocalDateTime dataDevolvido;
 
-    public Emprestimo() {}
+    public Emprestimo() {
+    }
 
     public Emprestimo(Long usuarioId, Long livroId) {
         this.usuarioId = usuarioId;
@@ -30,25 +31,55 @@ public class Emprestimo implements Persistivel {
         this.dataDevolucaoPrevista = this.dataEmprestimo.plusDays(PRAZO_DIAS);
     }
 
-    @Override public Long getId() { return id; }
-    @Override public void setId(Long id) { this.id = id; }
+    @Override
+    public Long getId() {
+        return id;
+    }
 
-    public Long getUsuarioId() { return usuarioId; }
-    public void setUsuarioId(Long usuarioId) { this.usuarioId = usuarioId; }
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public Long getLivroId() { return livroId; }
-    public void setLivroId(Long livroId) { this.livroId = livroId; }
+    public Long getUsuarioId() {
+        return usuarioId;
+    }
 
-    public LocalDateTime getDataEmprestimo() { return dataEmprestimo; }
-    public void setDataEmprestimo(LocalDateTime dataEmprestimo) { this.dataEmprestimo = dataEmprestimo; }
+    public void setUsuarioId(Long usuarioId) {
+        this.usuarioId = usuarioId;
+    }
 
-    public LocalDateTime getDataDevolucaoPrevista() { return dataDevolucaoPrevista; }
+    public Long getLivroId() {
+        return livroId;
+    }
+
+    public void setLivroId(Long livroId) {
+        this.livroId = livroId;
+    }
+
+    public LocalDateTime getDataEmprestimo() {
+        return dataEmprestimo;
+    }
+
+    public void setDataEmprestimo(LocalDateTime dataEmprestimo) {
+        this.dataEmprestimo = dataEmprestimo;
+    }
+
+    public LocalDateTime getDataDevolucaoPrevista() {
+        return dataDevolucaoPrevista;
+    }
+
     public void setDataDevolucaoPrevista(LocalDateTime dataDevolucaoPrevista) {
         this.dataDevolucaoPrevista = dataDevolucaoPrevista;
     }
 
-    public LocalDateTime getDataDevolvido() { return dataDevolvido; }
-    public void setDataDevolvido(LocalDateTime dataDevolvido) { this.dataDevolvido = dataDevolvido; }
+    public LocalDateTime getDataDevolvido() {
+        return dataDevolvido;
+    }
+
+    public void setDataDevolvido(LocalDateTime dataDevolvido) {
+        this.dataDevolvido = dataDevolvido;
+    }
 
     public boolean isDevolvido() {
         return dataDevolvido != null;
@@ -62,8 +93,8 @@ public class Emprestimo implements Persistivel {
      * Retorna true se o empréstimo está atrasado.
      *
      * Um empréstimo está atrasado quando:
-     *   - ainda não foi devolvido (dataDevolvido == null), E
-     *   - o instante atual é posterior à dataDevolucaoPrevista
+     * - ainda não foi devolvido (dataDevolvido == null), E
+     * - o instante atual é posterior à dataDevolucaoPrevista
      *
      * Dica: use LocalDateTime.now() e o método isAfter()
      */
@@ -83,34 +114,29 @@ public class Emprestimo implements Persistivel {
      * Calcula a multa acumulada em reais (R$ 1,00 por dia de atraso).
      *
      * Regras:
-     *   - Se não estiver atrasado → retorna BigDecimal.ZERO
-     *   - Se já foi devolvido → calcula com base em dataDevolvido
-     *   - Se ainda não devolvido → calcula com base em LocalDateTime.now()
+     * - Se não estiver atrasado → retorna BigDecimal.ZERO
+     * - Se já foi devolvido → calcula com base em dataDevolvido
+     * - Se ainda não devolvido → calcula com base em LocalDateTime.now()
      *
      * Passos:
-     *   1. Se !estaAtrasado(), retorne BigDecimal.ZERO
-     *   2. Determine a data de referência:
-     *        - isDevolvido() → use dataDevolvido
-     *        - senão         → use LocalDateTime.now()
-     *   3. Calcule os dias de atraso:
-     *        long dias = ChronoUnit.DAYS.between(dataDevolucaoPrevista, referencia)
-     *   4. Retorne MULTA_POR_DIA.multiply(BigDecimal.valueOf(dias))
+     * 1. Se !estaAtrasado(), retorne BigDecimal.ZERO
+     * 2. Determine a data de referência:
+     * - isDevolvido() → use dataDevolvido
+     * - senão → use LocalDateTime.now()
+     * 3. Calcule os dias de atraso:
+     * long dias = ChronoUnit.DAYS.between(dataDevolucaoPrevista, referencia)
+     * 4. Retorne MULTA_POR_DIA.multiply(BigDecimal.valueOf(dias))
      */
     public BigDecimal calcularMulta() {
-        // TODO Exercício 1b
-        //throw new UnsupportedOperationException("Não implementado — veja TODO Exercício 1b");
         if (!estaAtrasado()) {
             return BigDecimal.ZERO;
         }
 
-        // verificar se empréstimos devolvidos atrasados podem retornar ZERO.
+        LocalDateTime referencia = isDevolvido() ? dataDevolvido : LocalDateTime.now();
 
-        LocalDateTime dataReferencia = LocalDateTime.now();
-        if (isDevolvido()){
-            dataReferencia = dataDevolvido;
-        }
-
-        long dias = ChronoUnit.DAYS.between(dataDevolucaoPrevista, dataReferencia);
+        long dias = ChronoUnit.DAYS.between(
+                dataDevolucaoPrevista,
+                referencia);
 
         return MULTA_POR_DIA.multiply(BigDecimal.valueOf(dias));
     }
@@ -123,42 +149,43 @@ public class Emprestimo implements Persistivel {
      * Formata um resumo legível do empréstimo.
      *
      * Formato esperado para empréstimo em aberto no prazo:
-     *   "Empréstimo #3 | Livro: 7 | Usuário: 2 | Vence: 20/05/2026 14:30"
+     * "Empréstimo #3 | Livro: 7 | Usuário: 2 | Vence: 20/05/2026 14:30"
      *
      * Formato esperado para empréstimo atrasado:
-     *   "Empréstimo #3 | Livro: 7 | Usuário: 2 | Vence: 20/05/2026 14:30 | ATRASADO | Multa: R$ 3,00"
+     * "Empréstimo #3 | Livro: 7 | Usuário: 2 | Vence: 20/05/2026 14:30 | ATRASADO |
+     * Multa: R$ 3,00"
      *
      * Formato esperado para empréstimo devolvido:
-     *   "Empréstimo #3 | Livro: 7 | Usuário: 2 | Vence: 20/05/2026 14:30 | Devolvido: 18/05/2026 09:00"
+     * "Empréstimo #3 | Livro: 7 | Usuário: 2 | Vence: 20/05/2026 14:30 | Devolvido:
+     * 18/05/2026 09:00"
      *
      * Passos:
-     *   1. Crie um DateTimeFormatter com padrão "dd/MM/yyyy HH:mm"
-     *   2. Formate dataDevolucaoPrevista com o formatter
-     *   3. Monte a String base: "Empréstimo #" + id + " | Livro: " + livroId + ...
-     *   4. Se isDevolvido(), acrescente " | Devolvido: " + dataDevolvido formatada
-     *   5. Se estaAtrasado(), acrescente " | ATRASADO | Multa: R$ " + calcularMulta()
-     *      Dica: String.format("%.2f", calcularMulta()) formata com 2 casas decimais
+     * 1. Crie um DateTimeFormatter com padrão "dd/MM/yyyy HH:mm"
+     * 2. Formate dataDevolucaoPrevista com o formatter
+     * 3. Monte a String base: "Empréstimo #" + id + " | Livro: " + livroId + ...
+     * 4. Se isDevolvido(), acrescente " | Devolvido: " + dataDevolvido formatada
+     * 5. Se estaAtrasado(), acrescente " | ATRASADO | Multa: R$ " + calcularMulta()
+     * Dica: String.format("%.2f", calcularMulta()) formata com 2 casas decimais
      */
     @Override
     public String toString() {
-        // TODO Exercício 1c
-        //throw new UnsupportedOperationException("Não implementado — veja TODO Exercício 1c");
-        DateTimeFormatter padraoDeFormatacao = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-        String dataDevolucaoPrevistaFormatada = dataDevolucaoPrevista.format(padraoDeFormatacao);
-        String dataDevolvidoFormatado = dataDevolvido.format(padraoDeFormatacao);
-        String multaFormatada = String.format("%.2f", calcularMulta());
+        String base = "Empréstimo #" + id +
+                " | Livro: " + livroId +
+                " | Usuário: " + usuarioId +
+                " | Vence: " + dataDevolucaoPrevista.format(formatter);
 
-        String resumoEmprestimo = "Empréstimo #" + id + " | Livro: " + livroId + " | Usuário: " + usuarioId + " | Vence: " + dataDevolucaoPrevistaFormatada;
-
-        if (isDevolvido()){
-            resumoEmprestimo = resumoEmprestimo + " | Devolvido: " + dataDevolvidoFormatado;
-        }
-        else if (estaAtrasado()){
-            resumoEmprestimo = resumoEmprestimo + " | ATRASADO | Multa: R$ " + multaFormatada;
+        if (isDevolvido()) {
+            return base + " | Devolvido: "
+                    + dataDevolvido.format(formatter);
         }
 
-        return resumoEmprestimo;
-            
+        if (estaAtrasado()) {
+            return base + " | ATRASADO | Multa: R$ "
+                    + calcularMulta();
+        }
+
+        return base;
     }
 }

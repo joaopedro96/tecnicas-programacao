@@ -19,8 +19,8 @@ public class BibliotecaServico {
     private final EmprestimoRepositorio emprestimoRepo;
 
     public BibliotecaServico(LivroRepositorio livroRepo,
-                              UsuarioRepositorio usuarioRepo,
-                              EmprestimoRepositorio emprestimoRepo) {
+            UsuarioRepositorio usuarioRepo,
+            EmprestimoRepositorio emprestimoRepo) {
         this.livroRepo = livroRepo;
         this.usuarioRepo = usuarioRepo;
         this.emprestimoRepo = emprestimoRepo;
@@ -60,9 +60,29 @@ public class BibliotecaServico {
      * @throws IllegalArgumentException se usuário ou livro não existir
      * @throws IllegalStateException    se alguma regra de negócio for violada
      */
+    // TODO Exercício 6
+
     public Emprestimo registrarEmprestimo(Long usuarioId, Long livroId) {
-        // TODO Exercício 6
-        throw new UnsupportedOperationException("Não implementado — veja TODO Exercício 6");
+        Usuario usuario = usuarioRepo.buscarPorId(usuarioId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado: " + usuarioId));
+
+        Livro livro = livroRepo.buscarPorId(livroId)
+                .orElseThrow(() -> new IllegalArgumentException("Livro não encontrado: " + livroId));
+
+        if (!validarLimiteEmprestimos(usuarioId)) {
+            throw new IllegalStateException(
+                    "Limite de empréstimos atingido para o usuário: " + usuarioId);
+        }
+
+        emprestimoRepo.buscarAbertos().stream()
+                .filter(e -> e.getLivroId().equals(livroId))
+                .findFirst()
+                .ifPresent(e -> {
+                    throw new IllegalStateException(
+                            "Livro já está emprestado: " + livroId);
+                });
+
+        return emprestimoRepo.salvar(new Emprestimo(usuarioId, livroId));
     }
 
     // -------------------------------------------------------------------------
