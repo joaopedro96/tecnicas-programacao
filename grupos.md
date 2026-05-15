@@ -21,9 +21,9 @@ Deivid Marcio Dos Santos Ferreira
 Victoria Riso Santana
 
 # Team 4:
-Lucas Silva De Deus - TL
+João Pedro Da Mata Gonçalves Ribeiro - TL
+Lucas Silva De Deus
 Robert Jacques
-João Pedro Da Mata Gonçalves Ribeiro
 Renata Aires Saraiva Rocha
 Tarsilla Amaral Rodrigues Dos Santos
 
